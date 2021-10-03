@@ -1,33 +1,52 @@
 from math import *
-# Задание №1
 import zipfile
 import os
 import hashlib
 import re
 import requests
 import csv
-# os.mkdir('D:\\new_dir')
+"""
+Задание 1
+Программно разархивировать архив в выбранную директорию
+"""
+os.mkdir('D:\\new_dir')
 directory_to_extract_to = "D:\\new_dir"  # директория извлечения файлов архива
-# arch_file = zipfile.ZipFile('D:\\lab1\\tiff-4.2.0_lab1.zip')  # путь к архиву
-# arch_file.extractall(directory_to_extract_to)
-# arch_file.close()
+arch_file = zipfile.ZipFile('D:\\lab1\\tiff-4.2.0_lab1.zip')  # путь к архиву
+arch_file.extractall(directory_to_extract_to)
+arch_file.close()
+"""
+Задание 2.1
+Получить список файлов(полный путь) формата txt, находящийся в directory_to_extract_to. 
+Сохранить полученный список в txt_files.
+"""
 txt_files = []
 for i, j, k in os.walk(directory_to_extract_to):
     for t in k:
         if ".txt" in t:
             txt_files.append(i + '\\' + t)
-# print(txt_files)
+print("Список всех файлов с расширением txt\n")
+print(txt_files)
+"""
+Задание 2.2
+Получить значения MD5 хеша для найденных файлов и вывести полученные данные на экран.
+"""
 result = []
 directories = []
-target_hash = "4636f9ae9fef12ebd56cd39586d33cfb"
-target_file = ''  # полный путь к искомому файлу
-target_file_data = ''  # содержимое искомого файла
+
 for i in txt_files:
     file_data = open(i, "rb")
     content = file_data.read()
     result.append(hashlib.md5(content).hexdigest())
     file_data.close()
-# print(result)
+print("Данные по хэшу\n")
+print(result)
+"""
+Задание 3
+Найти файл с хэшем 4636f9ae9fef12ebd56cd39586d33cfb. Прочитать содержимое файла.
+"""
+target_hash = "4636f9ae9fef12ebd56cd39586d33cfb"
+target_file = ''  # полный путь к искомому файлу
+target_file_data = ''  # содержимое искомого файла
 for i, j, k in os.walk(directory_to_extract_to):
     for t in k:
         file_data = open(i + '\\' + t, "rb")
@@ -37,8 +56,10 @@ for i, j, k in os.walk(directory_to_extract_to):
             target_file_data = content
 print(target_file)
 print(target_file_data)
-# задача 4
-
+"""
+Задача 4
+Распарсить содержимое HTML страницы и поместить данные таблицы в словарь
+"""
 r = requests.get(target_file_data)
 result_dct = {}  # словарь для записи содержимого таблицы
 counter = 0
@@ -50,9 +71,9 @@ headers = []
 for line in lines:
     if counter == 0:
         headers = re.sub('<.*?>', ' ', line)
-        #print(headers)
+        # print(headers)
         headers = re.findall(r'Заболели|Умерли|Вылечились|Активные случаи', headers)
-        #print(headers)
+        # print(headers)
     else:
         temp = re.sub('<.*?>', ';', line)
         temp = re.sub(regex, '', temp)
@@ -62,14 +83,14 @@ for line in lines:
         temp = re.sub('(?<=\d)\s', '', temp)
         temp = re.sub('(?<=0)\*', '',temp)
         temp = re.sub('_', '-1', temp)
-        #print(temp)
+        # print(temp)
         tmp_split = temp.split(';')
         if len(tmp_split) == 6:
             tmp_split.pop(0)
-        #print(tmp_split)
+        # print(tmp_split)
         country_name = tmp_split[0]
         country_name = re.sub('.*\s\s', '', country_name)
-        #print(country_name)
+        # print(country_name)
         col1_val = tmp_split[1]
         col2_val = tmp_split[2]
         col3_val = tmp_split[3]
@@ -81,16 +102,19 @@ for line in lines:
         result_dct[country_name][3] = int(col4_val)
     counter += 1
 headers.insert(0, ' ')
-print(headers)
-print(result_dct)
-# Задание №5
-# Запись данных из полученного словаря в файл
+"""
+Задание 5
+Запись данных из полученного словаря в файл
+"""
 output = open('data.csv', 'w')
 w = csv.writer(output, delimiter=";")
 w.writerow(headers)
 for key in result_dct.keys():
     w.writerow([key, result_dct[key][0], result_dct[key][1], result_dct[key][2], result_dct[key][3]])
 output.close()
-
-#target_country = input("Введите название страны: ")
-#print(result_dct[target_country])
+"""
+Задание 6
+Вывод данных на экран для указанного первичного ключа.
+"""
+target_country = input("Введите название страны: ")
+print(result_dct[target_country])
