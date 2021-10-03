@@ -5,7 +5,7 @@ import os
 import hashlib
 import re
 import requests
-
+import csv
 # os.mkdir('D:\\new_dir')
 directory_to_extract_to = "D:\\new_dir"  # директория извлечения файлов архива
 # arch_file = zipfile.ZipFile('D:\\lab1\\tiff-4.2.0_lab1.zip')  # путь к архиву
@@ -80,14 +80,17 @@ for line in lines:
         result_dct[country_name][2] = int(col3_val)
         result_dct[country_name][3] = int(col4_val)
     counter += 1
+headers.insert(0, ' ')
 print(headers)
-#print(result_dct)
+print(result_dct)
 # Задание №5
 # Запись данных из полученного словаря в файл
-#output = open('data.csv', 'w')
-#for key in result_dct.keys():
+output = open('data.csv', 'w')
+w = csv.writer(output, delimiter=";")
+w.writerow(headers)
+for key in result_dct.keys():
+    w.writerow([key, result_dct[key][0], result_dct[key][1], result_dct[key][2], result_dct[key][3]])
+output.close()
 
-#output.close()
-
-target_country = input("Введите название страны: ")
-print(result_dct[target_country])
+#target_country = input("Введите название страны: ")
+#print(result_dct[target_country])
