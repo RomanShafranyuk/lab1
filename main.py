@@ -1,16 +1,16 @@
-from math import *
 import zipfile
 import os
 import hashlib
 import re
 import requests
 import csv
+
 """
 Задание 1
 Программно разархивировать архив в выбранную директорию
 """
 os.mkdir('D:\\new_dir')
-directory_to_extract_to = "D:\\new_dir"  # директория извлечения файлов архива
+directory_to_extract_to = r"D:\\new_dir"  # директория извлечения файлов архива
 arch_file = zipfile.ZipFile('D:\\lab1\\tiff-4.2.0_lab1.zip')  # путь к архиву
 arch_file.extractall(directory_to_extract_to)
 arch_file.close()
@@ -22,10 +22,13 @@ arch_file.close()
 txt_files = []
 for i, j, k in os.walk(directory_to_extract_to):
     for t in k:
+        tmp = os.path.join(i, t)
         if ".txt" in t:
-            txt_files.append(i + '\\' + t)
-print("Список всех файлов с расширением txt\n")
-print(txt_files)
+            txt_files.append(tmp)
+        # txt_files.append(tmp)
+print("Список всех файлов с расширением txt")
+print('\n'.join(txt_files))
+print('\n')
 """
 Задание 2.2
 Получить значения MD5 хеша для найденных файлов и вывести полученные данные на экран.
@@ -38,22 +41,25 @@ for i in txt_files:
     content = file_data.read()
     result.append(hashlib.md5(content).hexdigest())
     file_data.close()
-print("Данные по хэшу\n")
-print(result)
+print("Данные по хэшу")
+print('\n'.join(result))
+print('\n')
 """
 Задание 3
 Найти файл с хэшем 4636f9ae9fef12ebd56cd39586d33cfb. Прочитать содержимое файла.
 """
 target_hash = "4636f9ae9fef12ebd56cd39586d33cfb"
-target_file = ''  # полный путь к искомому файлу
+target_file = r''  # полный путь к искомому файлу
 target_file_data = ''  # содержимое искомого файла
 for i, j, k in os.walk(directory_to_extract_to):
     for t in k:
-        file_data = open(i + '\\' + t, "rb")
+        tmp = os.path.join(i, t)
+        file_data = open(tmp, "rb")
         content = file_data.read()
         if hashlib.md5(content).hexdigest() == target_hash:
             target_file = i
             target_file_data = content
+print("Путь файла с указанным хэшем")
 print(target_file)
 print(target_file_data)
 """
@@ -78,10 +84,10 @@ for line in lines:
         temp = re.sub('<.*?>', ';', line)
         temp = re.sub(regex, '', temp)
         temp = re.sub(';+', ';', temp)
-        temp = temp[1: len(temp)-1]
+        temp = temp[1: len(temp) - 1]
         temp = re.sub('\s(?=\d)', '', temp)
         temp = re.sub('(?<=\d)\s', '', temp)
-        temp = re.sub('(?<=0)\*', '',temp)
+        temp = re.sub('(?<=0)\*', '', temp)
         temp = re.sub('_', '-1', temp)
         # print(temp)
         tmp_split = temp.split(';')
